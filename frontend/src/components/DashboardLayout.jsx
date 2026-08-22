@@ -57,6 +57,80 @@ function AvatarMenu() {
   );
 }
 
+// Notification bell — dropdown of the signed-in user's own notifications
+// (leave requested/approved/rejected, employee account created). Opening the
+// dropdown marks everything read, same as the read-all endpoint is meant to
+// be used. See docs/dayflow-spec.md → Future Enhancements.
+function NotificationBell() {
+  const { token } = useAuth();
+  const [notifications, setNotifications] = useState([]);
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  useEffect(() => {
+    api
+      .getNotifications(token)
+      .then(setNotifications)
+      .catch(() => {
+        // Non-fatal — bell just shows no notifications.
+      });
+  }, [token]);
+
+  useEffect(() => {
+    function onClickOutside(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, []);
+
+  async function handleToggle() {
+    const opening = !open;
+    setOpen(opening);
+    if (!opening || unreadCount === 0) return;
+
+    try {
+      await api.markNotificationsRead(token);
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    } catch {
+      // Non-fatal — the dot just stays lit until the next successful open.
+    }
+  }
+
+  return (
+    <div className="topnav-bell-wrap" ref={ref}>
+      <button type="button" className="topnav-bell" aria-label="Notifications" onClick={handleToggle}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path
+            d="M12 3a6 6 0 0 0-6 6v3.5c0 .6-.2 1.2-.6 1.7L4 16h16l-1.4-1.8a2.7 2.7 0 0 1-.6-1.7V9a6 6 0 0 0-6-6Z"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinejoin="round"
+          />
+          <path d="M9.5 19a2.5 2.5 0 0 0 5 0" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        </svg>
+        {unreadCount > 0 && <span className="topnav-bell-dot" />}
+      </button>
+      {open && (
+        <div className="topnav-bell-menu">
+          {notifications.length === 0 ? (
+            <div className="topnav-bell-empty">No notifications yet.</div>
+          ) : (
+            notifications.map((n) => (
+              <div key={n._id} className={`topnav-bell-item${n.read ? "" : " topnav-bell-item--unread"}`}>
+                <span className="topnav-bell-item-message">{n.message}</span>
+                <span className="topnav-bell-item-time">{new Date(n.createdAt).toLocaleString()}</span>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function todayKey() {
   return new Date().toISOString().slice(0, 10);
 }
@@ -133,21 +207,15 @@ export default function DashboardLayout() {
           <NavLink to={`${base}/timeoff`} className={({ isActive }) => (isActive ? "active" : "")}>
             Time Off
           </NavLink>
+          {user.role === "admin" && (
+            <NavLink to={`${base}/reports`} className={({ isActive }) => (isActive ? "active" : "")}>
+              Reports
+            </NavLink>
+          )}
         </nav>
         <div className="topnav-actions">
           <CheckInOutButton />
-          <div className="topnav-bell" aria-label="Notifications">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                d="M12 3a6 6 0 0 0-6 6v3.5c0 .6-.2 1.2-.6 1.7L4 16h16l-1.4-1.8a2.7 2.7 0 0 1-.6-1.7V9a6 6 0 0 0-6-6Z"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinejoin="round"
-              />
-              <path d="M9.5 19a2.5 2.5 0 0 0 5 0" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-            </svg>
-            <span className="topnav-bell-dot" />
-          </div>
+          <NotificationBell />
           <AvatarMenu />
         </div>
       </header>

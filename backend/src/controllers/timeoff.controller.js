@@ -1,6 +1,8 @@
 import TimeOff, { TYPES } from "../models/TimeOff.js";
 import Attendance from "../models/Attendance.js";
 import User from "../models/User.js";
+import { sendEmail } from "../services/email.service.js";
+import { notify } from "../services/notification.service.js";
 
 // Local calendar day as "YYYY-MM-DD" — same reasoning as
 // attendance.controller.js's identical helper: toISOString() converts to UTC
@@ -125,7 +127,37 @@ export async function create(req, res) {
     attachment,
   });
 
+  // Notify every admin/HR account in the company — not awaited, same
+  // fire-and-forget reasoning as auth.controller.js's employee_created
+  // notification. See docs/dayflow-spec.md → Future Enhancements.
+  notifyAdminsOfRequest(request, req.user).catch((err) =>
+    console.error("[notify] leave_requested failed:", err.message)
+  );
+
   res.status(201).json(request);
+}
+
+async function notifyAdminsOfRequest(request, requester) {
+  const admins = await User.find({ companyCode: request.companyCode, role: "admin" }).select("_id email");
+
+  await Promise.all(
+    admins.map((admin) =>
+      notify({
+        userId: admin._id,
+        companyCode: request.companyCode,
+        message: `${requester.name} requested ${request.type} (${request.startDate} – ${request.endDate})`,
+        type: "leave_requested",
+      })
+    )
+  );
+
+  for (const admin of admins) {
+    sendEmail({
+      to: admin.email,
+      subject: "New Time Off request",
+      text: `${requester.name} requested ${request.type} from ${request.startDate} to ${request.endDate}. Review it in Dayflow.`,
+    });
+  }
 }
 
 // GET /api/timeoff/admin (admin/HR only)
@@ -143,7 +175,7 @@ async function setStatus(req, res, status) {
     { _id: req.params.id, companyCode: req.user.companyCode },
     { status },
     { new: true }
-  ).populate("employee", "name loginId");
+  ).populate("employee", "name loginId email");
 
   if (!request) {
     res.status(404).json({ message: "Request not found" });
@@ -153,12 +185,34 @@ async function setStatus(req, res, status) {
   return request;
 }
 
+// Notifies the requesting employee of an approve/reject decision — not
+// awaited by callers, same fire-and-forget reasoning as elsewhere in this
+// file. See docs/dayflow-spec.md → Future Enhancements.
+async function notifyEmployeeOfDecision(request, decision) {
+  const verb = decision === "Approved" ? "approved" : "rejected";
+  await notify({
+    userId: request.employee._id,
+    companyCode: request.companyCode,
+    message: `Your ${request.type} request (${request.startDate} – ${request.endDate}) was ${verb}.`,
+    type: decision === "Approved" ? "leave_approved" : "leave_rejected",
+  });
+
+  sendEmail({
+    to: request.employee.email,
+    subject: `Time Off request ${verb}`,
+    text: `Your ${request.type} request from ${request.startDate} to ${request.endDate} was ${verb}.`,
+  });
+}
+
 // POST /api/timeoff/:id/approve (admin/HR only)
 export async function approve(req, res) {
   const request = await setStatus(req, res, "Approved");
   if (!request) return; // setStatus already sent the 404
 
   await markLeaveDays(request);
+  notifyEmployeeOfDecision(request, "Approved").catch((err) =>
+    console.error("[notify] leave_approved failed:", err.message)
+  );
   res.json(request);
 }
 
@@ -166,5 +220,8 @@ export async function approve(req, res) {
 export async function reject(req, res) {
   const request = await setStatus(req, res, "Rejected");
   if (!request) return;
+  notifyEmployeeOfDecision(request, "Rejected").catch((err) =>
+    console.error("[notify] leave_rejected failed:", err.message)
+  );
   res.json(request);
 }

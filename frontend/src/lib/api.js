@@ -65,4 +65,13 @@ export const api = {
   getAllTimeOff: (token) => request("/timeoff/admin", { token }),
   approveTimeOff: (id, token) => request(`/timeoff/${id}/approve`, { method: "POST", token }),
   rejectTimeOff: (id, token) => request(`/timeoff/${id}/reject`, { method: "POST", token }),
+
+  // Matches backend/src/routes/notifications.routes.js.
+  getNotifications: (token) => request("/notifications", { token }),
+  markNotificationsRead: (token) => request("/notifications/read-all", { method: "POST", token }),
+
+  // Matches backend/src/routes/reports.routes.js — admin only.
+  getAttendanceSummary: ({ month, year } = {}, token) =>
+    request(`/reports/attendance-summary?${new URLSearchParams({ month, year })}`, { token }),
+  getPayrollSummary: (token) => request("/reports/payroll-summary", { token }),
 };

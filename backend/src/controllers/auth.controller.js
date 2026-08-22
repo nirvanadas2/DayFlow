@@ -2,6 +2,8 @@ import User from "../models/User.js";
 import { generateToken } from "../utils/generateToken.js";
 import { generateCompanyCode, generateLoginId } from "../utils/generateLoginId.js";
 import { generateTempPassword } from "../utils/generatePassword.js";
+import { sendEmail } from "../services/email.service.js";
+import { notify } from "../services/notification.service.js";
 
 function sendAuthResponse(res, status, user) {
   const token = generateToken(user._id, user.role);
@@ -144,6 +146,22 @@ export async function createEmployee(req, res) {
     password,
     role: "employee",
     mustChangePassword: true,
+  });
+
+  // Not awaited — a slow/unconfigured mail server shouldn't hold up the
+  // response; both helpers already swallow their own errors. See
+  // docs/dayflow-spec.md → Future Enhancements.
+  notify({
+    userId: employee._id,
+    companyCode: employee.companyCode,
+    message: `Your Dayflow account is ready. Login ID: ${employee.loginId}`,
+    type: "employee_created",
+  }).catch((err) => console.error("[notify] employee_created failed:", err.message));
+
+  sendEmail({
+    to: employee.email,
+    subject: "Your Dayflow account is ready",
+    text: `Hi ${employee.name},\n\nYour Dayflow account has been created.\n\nLogin ID: ${employee.loginId}\nTemporary Password: ${password}\n\nSign in and change your password from the profile menu.`,
   });
 
   res.status(201).json({
