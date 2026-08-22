@@ -41,6 +41,12 @@ export const api = {
   updateEmployee: (id, payload, token) =>
     request(`/employees/${id}`, { method: "PATCH", body: payload, token }),
 
+  // Matches backend/src/routes/salarySettings.routes.js. Company-wide, not
+  // tied to any one employee.
+  getSalarySettings: (token) => request("/salary-settings", { token }),
+  updateSalarySettings: (payload, token) =>
+    request("/salary-settings", { method: "PUT", body: payload, token }),
+
   // Stubbed — backend/src/routes/attendance.routes.js has no endpoints yet.
   // Swap these for real request() calls once check-in/out routes exist.
   checkIn: () => new Promise((resolve) => setTimeout(() => resolve({ status: "present" }), 300)),

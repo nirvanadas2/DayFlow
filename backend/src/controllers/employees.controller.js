@@ -1,11 +1,12 @@
 import User from "../models/User.js";
 
 const PROFILE_FIELDS =
-  "name email phone role loginId companyName attendanceStatus photo title aboutMe interests bloodGroup address emergencyContact";
+  "name email phone role loginId companyName attendanceStatus photo title aboutMe interests bloodGroup address emergencyContact wageType fixedWage workingDaysPerWeek";
 
-// Fields an admin may edit via the Profile / Private Info tabs. Salary Info
-// has no fields yet (Phase 4 placeholder) and login credentials aren't part
-// of this UI, so neither is included here.
+// Fields an admin may edit via the Profile / Private Info / Salary Info tabs.
+// Login credentials aren't part of this UI, so they're not included here.
+// Component percentages (Basic %, HRA %, etc.) live company-wide in
+// SalarySettings and go through /api/salary-settings instead.
 const ADMIN_EDITABLE_FIELDS = [
   "photo",
   "name",
@@ -16,6 +17,9 @@ const ADMIN_EDITABLE_FIELDS = [
   "bloodGroup",
   "address",
   "emergencyContact",
+  "wageType",
+  "fixedWage",
+  "workingDaysPerWeek",
 ];
 
 // An employee editing their own profile: everything else on the Profile /

@@ -87,6 +87,20 @@ const userSchema = new mongoose.Schema(
     emergencyContact: {
       type: String,
     },
+
+    // Salary Info tab (admin-only) — see docs/dayflow-spec.md → Employee
+    // profile → Salary Info. Component percentages live company-wide in
+    // SalarySettings, not per-employee.
+    wageType: {
+      type: String,
+      enum: ["monthly", "yearly"],
+    },
+    fixedWage: {
+      type: Number,
+    },
+    workingDaysPerWeek: {
+      type: Number,
+    },
   },
   { timestamps: true }
 );
