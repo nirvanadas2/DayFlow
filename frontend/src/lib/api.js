@@ -38,6 +38,8 @@ export const api = {
   // Matches backend/src/routes/employees.routes.js.
   listEmployees: (token) => request("/employees", { token }),
   getEmployee: (id, token) => request(`/employees/${id}`, { token }),
+  updateEmployee: (id, payload, token) =>
+    request(`/employees/${id}`, { method: "PATCH", body: payload, token }),
 
   // Stubbed — backend/src/routes/attendance.routes.js has no endpoints yet.
   // Swap these for real request() calls once check-in/out routes exist.

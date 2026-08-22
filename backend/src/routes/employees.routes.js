@@ -1,14 +1,17 @@
 import express from "express";
 import { protect, roleCheck } from "../middleware/auth.js";
-import { listEmployees, getEmployeeById } from "../controllers/employees.controller.js";
+import { listEmployees, getEmployeeById, updateEmployeeById } from "../controllers/employees.controller.js";
 
-// Employee directory / profile endpoints. Profile, Private Info, and Salary
-// Info tabs land here in Phase 3 — see docs/dayflow-spec.md → Employee profile.
+// Employee directory / profile endpoints — see docs/dayflow-spec.md →
+// Employee profile. The grid is admin-only; :id routes allow admin (any
+// employee) or a signed-in employee viewing/editing themself — enforced in
+// the controller since that needs the target id, not just the role.
 const router = express.Router();
 
 router.use(protect);
 
 router.get("/", roleCheck("admin"), listEmployees);
-router.get("/:id", roleCheck("admin"), getEmployeeById);
+router.get("/:id", getEmployeeById);
+router.patch("/:id", updateEmployeeById);
 
 export default router;

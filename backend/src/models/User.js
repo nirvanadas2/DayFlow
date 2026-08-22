@@ -60,6 +60,33 @@ const userSchema = new mongoose.Schema(
       enum: ["present", "leave", "absent"],
       default: "absent",
     },
+
+    // Profile tab — see docs/dayflow-spec.md → Employee profile.
+    photo: {
+      type: String, // data URL; no file storage backend yet
+    },
+    title: {
+      type: String,
+      trim: true,
+    },
+    aboutMe: {
+      type: String,
+    },
+    interests: {
+      type: String,
+    },
+
+    // Private Info tab.
+    bloodGroup: {
+      type: String,
+      trim: true,
+    },
+    address: {
+      type: String,
+    },
+    emergencyContact: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

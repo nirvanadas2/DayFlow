@@ -1,19 +1,21 @@
 import { Routes, Route } from "react-router-dom";
+import DashboardLayout from "../../components/DashboardLayout.jsx";
+import EmployeeProfile from "../EmployeeProfile.jsx";
+import TabPlaceholder from "../TabPlaceholder.jsx";
 
-// Mounted at /employee/* — nested employee routes (profile, attendance,
-// time off) land here. See docs/dayflow-spec.md → Dashboard.
-function EmployeeHome() {
-  return (
-    <div>
-      <h1>Employee</h1>
-    </div>
-  );
-}
-
+// Mounted at /employee/* — an employee's own dashboard. "My Profile" (from
+// the topnav avatar menu) lands here at /employee/profile with no :id — the
+// profile page resolves the viewer's own id. See docs/dayflow-spec.md →
+// Dashboard.
 export default function EmployeeApp() {
   return (
     <Routes>
-      <Route index element={<EmployeeHome />} />
+      <Route element={<DashboardLayout />}>
+        <Route index element={<TabPlaceholder title="Dashboard" />} />
+        <Route path="profile" element={<EmployeeProfile />} />
+        <Route path="attendance" element={<TabPlaceholder title="Attendance" />} />
+        <Route path="timeoff" element={<TabPlaceholder title="Time Off" />} />
+      </Route>
     </Routes>
   );
 }

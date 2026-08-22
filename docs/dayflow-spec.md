@@ -21,13 +21,26 @@
 - Avatar click → dropdown: My Profile, Log Out.
 - Admin lands on a grid of employee photo-cards. Each card: avatar, name, small status dot top-right
   (see Status colors above).
-- Clicking a card opens that employee's profile in read-only (non-editable) mode.
+- Clicking a card opens that employee's profile in read-only mode by default: fields render as text,
+  not inputs. An admin-only "Edit" button unlocks the same page into an editable form; "Cancel"
+  reverts back to read-only without saving. This read-only default applies to admin viewing any
+  profile (their own or another employee's) — see Employee profile below for exactly which fields
+  each editor can change.
 - Check In / Check Out button on the dashboard — on successful check-in, that employee's status dot
   turns green in real time.
 
 ## Employee profile — 3 tabs
 - **Profile**: photo, name, title, free-text "about me" and "interests/hobbies" fields.
 - **Private Info**: phone, blood group, address, emergency contact, personal details.
+- Two edit states, per the Dashboard section above:
+  - **Admin, read-only (default)**: opened via a card click (or the admin's own "My Profile"). All
+    Profile / Private Info fields render as text. An "Edit" button switches the page into an editable
+    form with every field on those two tabs open for editing; "Cancel" discards any unsaved changes
+    and returns to read-only without hitting the API.
+  - **Employee, self-edit (always on, no toggle)**: an employee viewing their own profile always sees
+    the editable form directly — no Edit button, no read-only step. Only photo, phone, address, about
+    me, and interests/hobbies are editable inputs; name, title, blood group, and emergency contact
+    render as read-only text.
 - **Salary Info**: admin-only tab, hidden entirely for employees viewing their own profile.
   - Fields: Wage Type, Fixed Wage (monthly/yearly), No. of working days/week.
   - Salary components, auto-calculated off wage: Basic, HRA, Standard Allowance, Performance Bonus,

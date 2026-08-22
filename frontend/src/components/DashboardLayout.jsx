@@ -43,7 +43,7 @@ function AvatarMenu() {
             type="button"
             onClick={() => {
               setOpen(false);
-              navigate(`/admin/employees/${user.id}`);
+              navigate(user.role === "admin" ? `/admin/employees/${user.id}` : "/employee/profile");
             }}
           >
             My Profile
@@ -85,19 +85,20 @@ function CheckInOutButton() {
 
 export default function DashboardLayout() {
   const { user } = useAuth();
+  const base = user.role === "admin" ? "/admin" : "/employee";
 
   return (
     <div className="dashboard-shell">
       <header className="topnav">
         <div className="topnav-logo">{user.companyName}</div>
         <nav className="topnav-tabs">
-          <NavLink to="/admin" end className={({ isActive }) => (isActive ? "active" : "")}>
-            Employees
+          <NavLink to={base} end className={({ isActive }) => (isActive ? "active" : "")}>
+            {user.role === "admin" ? "Employees" : "Dashboard"}
           </NavLink>
-          <NavLink to="/admin/attendance" className={({ isActive }) => (isActive ? "active" : "")}>
+          <NavLink to={`${base}/attendance`} className={({ isActive }) => (isActive ? "active" : "")}>
             Attendance
           </NavLink>
-          <NavLink to="/admin/timeoff" className={({ isActive }) => (isActive ? "active" : "")}>
+          <NavLink to={`${base}/timeoff`} className={({ isActive }) => (isActive ? "active" : "")}>
             Time Off
           </NavLink>
         </nav>
