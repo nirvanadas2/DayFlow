@@ -19,6 +19,14 @@
   font-weight: 700;
   font-size: var(--font-size-lg);
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+
+.topnav-logo-img {
+  height: 32px;
+  max-width: 160px;
+  object-fit: contain;
 }
 
 .topnav-tabs {
@@ -218,6 +226,36 @@
   font-weight: 600;
   color: var(--color-text);
   text-align: center;
+}
+
+.employee-card-photo {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+}
+
+.employee-card--add {
+  color: var(--color-text-secondary);
+  border-style: dashed;
+  box-shadow: none;
+}
+
+.employee-card--add:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.employee-card-add-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+  border: 2px dashed var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xl);
+  color: inherit;
 }
 
 /* Employee profile */
@@ -783,6 +821,10 @@
 
 .attendance-row-absent td {
   color: var(--color-text-muted);
+}
+
+.attendance-row-leave td {
+  color: var(--color-status-leave);
 }
 
 .attendance-empty {

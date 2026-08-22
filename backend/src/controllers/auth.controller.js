@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import { generateToken } from "../utils/generateToken.js";
 import { generateCompanyCode, generateLoginId } from "../utils/generateLoginId.js";
+import { generateTempPassword } from "../utils/generatePassword.js";
 
 function sendAuthResponse(res, status, user) {
   const token = generateToken(user._id, user.role);
@@ -13,7 +14,9 @@ function sendAuthResponse(res, status, user) {
       email: user.email,
       role: user.role,
       companyName: user.companyName,
+      companyLogo: user.companyLogo,
       mustChangePassword: user.mustChangePassword,
+      attendanceStatus: user.attendanceStatus,
     },
   });
 }
@@ -22,7 +25,7 @@ function sendAuthResponse(res, status, user) {
 // Creates the company's first account (Admin/HR). There is no open employee
 // self-registration — see docs/dayflow-spec.md → Auth.
 export async function signup(req, res) {
-  const { companyName, name, email, phone, password } = req.body;
+  const { companyName, name, email, phone, password, companyLogo } = req.body;
 
   if (!companyName || !name || !email || !password) {
     return res.status(400).json({ message: "Missing required fields" });
@@ -41,6 +44,7 @@ export async function signup(req, res) {
   const user = await User.create({
     companyName,
     companyCode,
+    companyLogo,
     loginId,
     name,
     email,
@@ -81,7 +85,9 @@ export async function getMe(req, res) {
     email: req.user.email,
     role: req.user.role,
     companyName: req.user.companyName,
+    companyLogo: req.user.companyLogo,
     mustChangePassword: req.user.mustChangePassword,
+    attendanceStatus: req.user.attendanceStatus,
   });
 }
 
@@ -105,11 +111,14 @@ export async function changePassword(req, res) {
 }
 
 // POST /api/auth/employees  (admin/HR only)
-// Creates an employee account with a system-generated login ID + first password.
+// Creates an employee account with a system-generated login ID + first
+// password — see docs/dayflow-spec.md → Auth. The admin never chooses the
+// password; it's returned once here so it can be relayed to the employee
+// (there's no email delivery in v1).
 export async function createEmployee(req, res) {
-  const { name, email, phone, password } = req.body;
+  const { name, email, phone } = req.body;
 
-  if (!name || !email || !password) {
+  if (!name || !email) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
@@ -118,14 +127,16 @@ export async function createEmployee(req, res) {
     return res.status(409).json({ message: "Email already in use" });
   }
 
-  const { companyCode, companyName } = req.user;
+  const { companyCode, companyName, companyLogo } = req.user;
   const joinYear = new Date().getFullYear();
   const serial = (await User.countDocuments({ companyCode })) + 1;
   const loginId = generateLoginId({ companyCode, name, joinYear, serial });
+  const password = generateTempPassword();
 
   const employee = await User.create({
     companyName,
     companyCode,
+    companyLogo,
     loginId,
     name,
     email,
@@ -141,5 +152,6 @@ export async function createEmployee(req, res) {
     name: employee.name,
     email: employee.email,
     role: employee.role,
+    temporaryPassword: password,
   });
 }

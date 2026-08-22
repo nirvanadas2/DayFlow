@@ -35,6 +35,9 @@ export const api = {
   changePassword: (payload, token) =>
     request("/auth/change-password", { method: "POST", body: payload, token }),
 
+  // Matches backend/src/routes/auth.routes.js — admin-only employee creation.
+  createEmployee: (payload, token) => request("/auth/employees", { method: "POST", body: payload, token }),
+
   // Matches backend/src/routes/employees.routes.js.
   listEmployees: (token) => request("/employees", { token }),
   getEmployee: (id, token) => request(`/employees/${id}`, { token }),

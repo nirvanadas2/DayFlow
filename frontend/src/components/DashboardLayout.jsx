@@ -116,7 +116,13 @@ export default function DashboardLayout() {
   return (
     <div className="dashboard-shell">
       <header className="topnav">
-        <div className="topnav-logo">{user.companyName}</div>
+        <div className="topnav-logo">
+          {user.companyLogo ? (
+            <img src={user.companyLogo} alt={user.companyName} className="topnav-logo-img" />
+          ) : (
+            user.companyName
+          )}
+        </div>
         <nav className="topnav-tabs">
           <NavLink to={base} end className={({ isActive }) => (isActive ? "active" : "")}>
             {user.role === "admin" ? "Employees" : "Dashboard"}

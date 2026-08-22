@@ -70,6 +70,8 @@ function SignInForm({ onSwitch }) {
   );
 }
 
+const MAX_LOGO_BYTES = 1.5 * 1024 * 1024;
+
 function SignUpForm({ onSwitch }) {
   const { signup } = useAuth();
   const navigate = useNavigate();
@@ -82,11 +84,26 @@ function SignUpForm({ onSwitch }) {
     confirmPassword: "",
   });
   const [logoFile, setLogoFile] = useState(null);
+  const [logoDataUrl, setLogoDataUrl] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   function update(field) {
     return (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
+  }
+
+  function handleLogoFile(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setError("");
+    if (file.size > MAX_LOGO_BYTES) {
+      setError("Logo must be under 1.5MB.");
+      return;
+    }
+    setLogoFile(file);
+    const reader = new FileReader();
+    reader.onload = () => setLogoDataUrl(reader.result);
+    reader.readAsDataURL(file);
   }
 
   async function handleSubmit(e) {
@@ -104,15 +121,13 @@ function SignUpForm({ onSwitch }) {
 
     setSubmitting(true);
     try {
-      // Note: the company logo isn't sent — the backend signup endpoint
-      // (auth.controller.js) doesn't accept a logo field yet. The file is
-      // captured here so this is a one-line change once that lands.
       const user = await signup({
         companyName: form.companyName,
         name: form.name,
         email: form.email,
         phone: form.phone,
         password: form.password,
+        companyLogo: logoDataUrl || undefined,
       });
       navigate(user.role === "admin" ? "/admin" : "/employee", { replace: true });
     } catch (err) {
@@ -140,13 +155,7 @@ function SignUpForm({ onSwitch }) {
           <button type="button" onClick={() => document.getElementById("companyLogo").click()}>
             Upload Logo
           </button>
-          <input
-            id="companyLogo"
-            type="file"
-            accept="image/*"
-            hidden
-            onChange={(e) => setLogoFile(e.target.files?.[0] ?? null)}
-          />
+          <input id="companyLogo" type="file" accept="image/*" hidden onChange={handleLogoFile} />
           <span>{logoFile ? logoFile.name : "No file"}</span>
         </div>
       </div>

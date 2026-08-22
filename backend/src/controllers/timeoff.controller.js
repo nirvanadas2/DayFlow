@@ -1,4 +1,66 @@
 import TimeOff, { TYPES } from "../models/TimeOff.js";
+import Attendance from "../models/Attendance.js";
+import User from "../models/User.js";
+
+// Local calendar day as "YYYY-MM-DD" — same reasoning as
+// attendance.controller.js's identical helper: toISOString() converts to UTC
+// first and would shift the date for positive UTC offsets (e.g. IST).
+function toDateKey(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function enumerateDateKeys(startKey, endKey) {
+  const [sy, sm, sd] = startKey.split("-").map(Number);
+  const [ey, em, ed] = endKey.split("-").map(Number);
+  const cursor = new Date(sy, sm - 1, sd);
+  const end = new Date(ey, em - 1, ed);
+  const keys = [];
+  while (cursor <= end) {
+    keys.push(toDateKey(cursor));
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return keys;
+}
+
+// Writes an Attendance "Leave" record for each day in an approved request's
+// range, so the Attendance tab actually reflects it instead of showing a
+// blank/Absent hole — see docs/dayflow-spec.md → Attendance and → Time Off.
+// Skips any day the employee already checked in for, so approving a leave
+// request never overwrites a real Present/Half-day record.
+async function markLeaveDays(request) {
+  const dateKeys = enumerateDateKeys(request.startDate, request.endDate);
+  const todayKey = toDateKey(new Date());
+  let coversToday = false;
+
+  for (const date of dateKeys) {
+    if (date === todayKey) coversToday = true;
+
+    const existing = await Attendance.findOne({ employee: request.employee, date });
+    if (existing) {
+      if (!existing.checkIn) {
+        existing.status = "Leave";
+        await existing.save();
+      }
+    } else {
+      await Attendance.create({
+        employee: request.employee,
+        companyCode: request.companyCode,
+        date,
+        status: "Leave",
+      });
+    }
+  }
+
+  if (coversToday) {
+    const today = await Attendance.findOne({ employee: request.employee, date: todayKey });
+    if (!today?.checkIn) {
+      await User.findByIdAndUpdate(request.employee, { attendanceStatus: "leave" });
+    }
+  }
+}
 
 // GET /api/timeoff/me
 // Self only — backs the employee's calendar highlighting. See
@@ -84,18 +146,25 @@ async function setStatus(req, res, status) {
   ).populate("employee", "name loginId");
 
   if (!request) {
-    return res.status(404).json({ message: "Request not found" });
+    res.status(404).json({ message: "Request not found" });
+    return null;
   }
 
-  res.json(request);
+  return request;
 }
 
 // POST /api/timeoff/:id/approve (admin/HR only)
-export function approve(req, res) {
-  return setStatus(req, res, "Approved");
+export async function approve(req, res) {
+  const request = await setStatus(req, res, "Approved");
+  if (!request) return; // setStatus already sent the 404
+
+  await markLeaveDays(request);
+  res.json(request);
 }
 
 // POST /api/timeoff/:id/reject (admin/HR only)
-export function reject(req, res) {
-  return setStatus(req, res, "Rejected");
+export async function reject(req, res) {
+  const request = await setStatus(req, res, "Rejected");
+  if (!request) return;
+  res.json(request);
 }

@@ -87,7 +87,16 @@ function AttendanceTable({ rows }) {
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={row.date} className={row.status === "Absent" ? "attendance-row-absent" : ""}>
+            <tr
+              key={row.date}
+              className={
+                row.status === "Leave"
+                  ? "attendance-row-leave"
+                  : row.status === "Absent"
+                    ? "attendance-row-absent"
+                    : ""
+              }
+            >
               <td>
                 {WEEKDAY_FMT.format(row.dateObj)}, {DAY_FMT.format(row.dateObj)}
               </td>

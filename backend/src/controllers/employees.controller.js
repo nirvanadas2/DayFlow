@@ -35,12 +35,13 @@ function canAccess(req, targetId) {
 }
 
 // GET /api/employees (admin/HR only)
-// Backs the dashboard employee grid and the Time Off Allocation sub-tab (the
-// latter needs the leave balance fields too — safe to include since this
+// Backs the dashboard employee grid — a grid of employee *photo*-cards, so
+// `photo` has to be selected too — and the Time Off Allocation sub-tab (the
+// latter needs the leave balance fields — safe to include since this
 // endpoint is already admin-only). See docs/dayflow-spec.md → Dashboard.
 export async function listEmployees(req, res) {
   const employees = await User.find({ companyCode: req.user.companyCode }).select(
-    "name email role loginId attendanceStatus paidLeaveBalance sickLeaveBalance"
+    "name email role loginId attendanceStatus photo paidLeaveBalance sickLeaveBalance"
   );
 
   res.json(employees);

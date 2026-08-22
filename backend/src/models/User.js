@@ -22,6 +22,13 @@ const userSchema = new mongoose.Schema(
       required: true,
       uppercase: true,
     },
+    // Set at signup, propagated onto every employee created under this
+    // company (same denormalization as companyName/companyCode). Data URL;
+    // no file storage backend yet. See docs/dayflow-spec.md → Dashboard
+    // ("Top nav: company logo…") and → Auth ("logo upload button").
+    companyLogo: {
+      type: String,
+    },
     name: {
       type: String,
       required: true,
