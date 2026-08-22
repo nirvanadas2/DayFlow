@@ -57,29 +57,55 @@ function AvatarMenu() {
   );
 }
 
+function todayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
 function CheckInOutButton() {
+  const { token, updateAttendanceStatus } = useAuth();
   const [checkedIn, setCheckedIn] = useState(false);
   const [pending, setPending] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const now = new Date();
+    api
+      .getMyAttendance({ month: now.getMonth() + 1, year: now.getFullYear() }, token)
+      .then((records) => {
+        const today = records.find((r) => r.date === todayKey());
+        setCheckedIn(!!today?.checkIn && !today?.checkOut);
+      })
+      .catch(() => {
+        // Non-fatal — button just falls back to "Check In".
+      });
+  }, [token]);
 
   async function handleClick() {
     setPending(true);
+    setError("");
     try {
       if (checkedIn) {
-        await api.checkOut();
+        await api.checkOut(token);
         setCheckedIn(false);
       } else {
-        await api.checkIn();
+        await api.checkIn(token);
         setCheckedIn(true);
+        updateAttendanceStatus("present");
       }
+    } catch (err) {
+      setError(err.message);
     } finally {
       setPending(false);
     }
   }
 
   return (
-    <button type="button" className="topnav-checkin" onClick={handleClick} disabled={pending}>
-      {checkedIn ? "Check Out" : "Check In"}
-    </button>
+    <div className="topnav-checkin-wrap">
+      <button type="button" className="topnav-checkin" onClick={handleClick} disabled={pending}>
+        {checkedIn ? "Check Out" : "Check In"}
+      </button>
+      {error && <span className="topnav-checkin-error">{error}</span>}
+    </div>
   );
 }
 

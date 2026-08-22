@@ -68,6 +68,17 @@ export function AuthProvider({ children }) {
     [token]
   );
 
+  // Used by the Check In/Check Out button so the topnav/employee-grid dot
+  // flips color immediately, without waiting on a full profile refetch.
+  const updateAttendanceStatus = useCallback((status) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+      const next = { ...prev, attendanceStatus: status };
+      localStorage.setItem(STORAGE_USER, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
   const logout = useCallback(() => {
     setToken(null);
     setUser(null);
@@ -76,7 +87,9 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ token, user, loading, login, signup, changePassword, logout }}>
+    <AuthContext.Provider
+      value={{ token, user, loading, login, signup, changePassword, updateAttendanceStatus, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

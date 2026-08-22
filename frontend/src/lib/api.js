@@ -47,8 +47,11 @@ export const api = {
   updateSalarySettings: (payload, token) =>
     request("/salary-settings", { method: "PUT", body: payload, token }),
 
-  // Stubbed — backend/src/routes/attendance.routes.js has no endpoints yet.
-  // Swap these for real request() calls once check-in/out routes exist.
-  checkIn: () => new Promise((resolve) => setTimeout(() => resolve({ status: "present" }), 300)),
-  checkOut: () => new Promise((resolve) => setTimeout(() => resolve({ status: "absent" }), 300)),
+  // Matches backend/src/routes/attendance.routes.js.
+  checkIn: (token) => request("/attendance/check-in", { method: "POST", token }),
+  checkOut: (token) => request("/attendance/check-out", { method: "POST", token }),
+  getMyAttendance: ({ month, year } = {}, token) =>
+    request(`/attendance/me?${new URLSearchParams({ month, year })}`, { token }),
+  getEmployeeAttendance: ({ employeeId, month, year } = {}, token) =>
+    request(`/attendance/admin?${new URLSearchParams({ employeeId, month, year })}`, { token }),
 };

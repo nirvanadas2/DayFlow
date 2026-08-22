@@ -28,7 +28,7 @@ function EmployeeCard({ employee, onClick }) {
 }
 
 export default function EmployeeGrid() {
-  const { token } = useAuth();
+  const { token, user: viewer } = useAuth();
   const navigate = useNavigate();
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,7 +50,14 @@ export default function EmployeeGrid() {
       {employees.map((employee) => (
         <EmployeeCard
           key={employee._id}
-          employee={employee}
+          // The signed-in user's own card reflects live check-in/out status
+          // immediately, without waiting on a grid refetch — see
+          // AuthContext's updateAttendanceStatus.
+          employee={
+            employee._id === viewer.id && viewer.attendanceStatus
+              ? { ...employee, attendanceStatus: viewer.attendanceStatus }
+              : employee
+          }
           onClick={() => navigate(`/admin/employees/${employee._id}`)}
         />
       ))}
