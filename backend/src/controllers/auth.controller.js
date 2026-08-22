@@ -85,6 +85,25 @@ export async function getMe(req, res) {
   });
 }
 
+// POST /api/auth/change-password (protected)
+// Added for Phase 1 (auth screens): there was no route to clear
+// mustChangePassword before this. Used by the forced password-change screen
+// — see docs/dayflow-spec.md → Auth.
+export async function changePassword(req, res) {
+  const { newPassword } = req.body;
+
+  if (!newPassword || newPassword.length < 8) {
+    return res.status(400).json({ message: "Password must be at least 8 characters" });
+  }
+
+  const user = await User.findById(req.user._id).select("+password");
+  user.password = newPassword;
+  user.mustChangePassword = false;
+  await user.save();
+
+  res.json({ message: "Password updated" });
+}
+
 // POST /api/auth/employees  (admin/HR only)
 // Creates an employee account with a system-generated login ID + first password.
 export async function createEmployee(req, res) {
