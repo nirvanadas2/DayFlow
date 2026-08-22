@@ -791,3 +791,213 @@
   padding: var(--space-5);
   text-align: center;
 }
+
+/* Time Off module */
+
+.timeoff-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.timeoff-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.timeoff-header-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.timeoff-balance-cards {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.timeoff-balance-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-4) var(--space-5);
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.timeoff-balance-title {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.timeoff-balance-value {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+/* Calendar */
+
+.timeoff-calendar {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-5);
+}
+
+.timeoff-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.timeoff-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--space-1);
+}
+
+.timeoff-calendar-weekday {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding-bottom: var(--space-2);
+}
+
+.timeoff-calendar-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+}
+
+.timeoff-calendar-cell--blank {
+  visibility: hidden;
+}
+
+.timeoff-calendar-cell--pending {
+  background: var(--color-surface-sunken);
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.timeoff-calendar-cell--approved {
+  background: var(--color-status-present);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* Request modal */
+
+.timeoff-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 25, 23, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  z-index: 20;
+}
+
+.timeoff-modal {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card-hover);
+  padding: var(--space-6);
+  width: 100%;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.timeoff-modal h2 {
+  margin: 0 0 var(--space-4);
+  font-size: var(--font-size-lg);
+}
+
+.timeoff-modal-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+/* Status badges + admin actions */
+
+.timeoff-status {
+  display: inline-block;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.timeoff-status--pending {
+  background: var(--color-surface-sunken);
+  color: var(--color-text-secondary);
+}
+
+.timeoff-status--approved {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--color-status-present);
+}
+
+.timeoff-status--rejected {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--color-status-notification);
+}
+
+.timeoff-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.timeoff-approve-btn,
+.timeoff-reject-btn {
+  border: none;
+  color: #ffffff;
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.timeoff-approve-btn {
+  background: var(--color-status-present);
+}
+
+.timeoff-reject-btn {
+  background: var(--color-status-notification);
+}
+
+.timeoff-approve-btn:disabled,
+.timeoff-reject-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.timeoff-allocation-input {
+  width: 80px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-surface);
+}
+
+.timeoff-allocation-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}

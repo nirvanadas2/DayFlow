@@ -1,10 +1,11 @@
 import User from "../models/User.js";
 
 const PROFILE_FIELDS =
-  "name email phone role loginId companyName attendanceStatus photo title aboutMe interests bloodGroup address emergencyContact wageType fixedWage workingDaysPerWeek";
+  "name email phone role loginId companyName attendanceStatus photo title aboutMe interests bloodGroup address emergencyContact wageType fixedWage workingDaysPerWeek paidLeaveBalance sickLeaveBalance";
 
-// Fields an admin may edit via the Profile / Private Info / Salary Info tabs.
-// Login credentials aren't part of this UI, so they're not included here.
+// Fields an admin may edit via the Profile / Private Info / Salary Info tabs,
+// plus the Time Off Allocation sub-tab (paid/sickLeaveBalance). Login
+// credentials aren't part of this UI, so they're not included here.
 // Component percentages (Basic %, HRA %, etc.) live company-wide in
 // SalarySettings and go through /api/salary-settings instead.
 const ADMIN_EDITABLE_FIELDS = [
@@ -20,6 +21,8 @@ const ADMIN_EDITABLE_FIELDS = [
   "wageType",
   "fixedWage",
   "workingDaysPerWeek",
+  "paidLeaveBalance",
+  "sickLeaveBalance",
 ];
 
 // An employee editing their own profile: everything else on the Profile /
@@ -32,10 +35,12 @@ function canAccess(req, targetId) {
 }
 
 // GET /api/employees (admin/HR only)
-// Backs the dashboard employee grid — see docs/dayflow-spec.md → Dashboard.
+// Backs the dashboard employee grid and the Time Off Allocation sub-tab (the
+// latter needs the leave balance fields too — safe to include since this
+// endpoint is already admin-only). See docs/dayflow-spec.md → Dashboard.
 export async function listEmployees(req, res) {
   const employees = await User.find({ companyCode: req.user.companyCode }).select(
-    "name email role loginId attendanceStatus"
+    "name email role loginId attendanceStatus paidLeaveBalance sickLeaveBalance"
   );
 
   res.json(employees);

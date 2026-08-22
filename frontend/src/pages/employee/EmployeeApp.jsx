@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import DashboardLayout from "../../components/DashboardLayout.jsx";
 import EmployeeProfile from "../EmployeeProfile.jsx";
 import Attendance from "../Attendance.jsx";
+import TimeOff from "../TimeOff.jsx";
 import TabPlaceholder from "../TabPlaceholder.jsx";
 
 // Mounted at /employee/* — an employee's own dashboard. "My Profile" (from
@@ -15,7 +16,7 @@ export default function EmployeeApp() {
         <Route index element={<TabPlaceholder title="Dashboard" />} />
         <Route path="profile" element={<EmployeeProfile />} />
         <Route path="attendance" element={<Attendance />} />
-        <Route path="timeoff" element={<TabPlaceholder title="Time Off" />} />
+        <Route path="timeoff" element={<TimeOff />} />
       </Route>
     </Routes>
   );

@@ -101,6 +101,19 @@ const userSchema = new mongoose.Schema(
     workingDaysPerWeek: {
       type: Number,
     },
+
+    // Time Off allocation — total days admin has granted this employee, set
+    // via the Allocation sub-tab. "Available" is this minus approved usage,
+    // computed on read in timeoff.controller.js. Unpaid Leave has no balance.
+    // See docs/dayflow-spec.md → Time Off.
+    paidLeaveBalance: {
+      type: Number,
+      default: 12,
+    },
+    sickLeaveBalance: {
+      type: Number,
+      default: 6,
+    },
   },
   { timestamps: true }
 );

@@ -10,9 +10,10 @@ app.use(
     credentials: true,
   })
 );
-// Raised from Express's 100kb default so profile photo updates (sent as a
-// base64 data URL — no file storage backend yet) fit.
-app.use(express.json({ limit: "2mb" }));
+// Raised from Express's 100kb default so profile photo updates and Time Off
+// Sick Leave attachments (both sent as a base64 data URL — no file storage
+// backend yet) fit.
+app.use(express.json({ limit: "5mb" }));
 
 app.get("/health", (req, res) => res.json({ status: "ok" }));
 

@@ -54,4 +54,12 @@ export const api = {
     request(`/attendance/me?${new URLSearchParams({ month, year })}`, { token }),
   getEmployeeAttendance: ({ employeeId, month, year } = {}, token) =>
     request(`/attendance/admin?${new URLSearchParams({ employeeId, month, year })}`, { token }),
+
+  // Matches backend/src/routes/timeoff.routes.js.
+  getMyTimeOff: (token) => request("/timeoff/me", { token }),
+  getTimeOffBalances: (token) => request("/timeoff/balances", { token }),
+  requestTimeOff: (payload, token) => request("/timeoff", { method: "POST", body: payload, token }),
+  getAllTimeOff: (token) => request("/timeoff/admin", { token }),
+  approveTimeOff: (id, token) => request(`/timeoff/${id}/approve`, { method: "POST", token }),
+  rejectTimeOff: (id, token) => request(`/timeoff/${id}/reject`, { method: "POST", token }),
 };
