@@ -137,7 +137,7 @@ export default function EmployeeGrid() {
   const [showAddModal, setShowAddModal] = useState(false);
 
   function refresh() {
-    return api
+    api
       .listEmployees(token)
       .then(setEmployees)
       .catch((err) => setError(err.message))
