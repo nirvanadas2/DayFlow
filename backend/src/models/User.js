@@ -53,6 +53,13 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // Placeholder for the employee grid's status dot until the real Attendance
+    // model exists — see docs/dayflow-spec.md → Dashboard / Attendance.
+    attendanceStatus: {
+      type: String,
+      enum: ["present", "leave", "absent"],
+      default: "absent",
+    },
   },
   { timestamps: true }
 );

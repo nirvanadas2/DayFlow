@@ -34,4 +34,13 @@ export const api = {
   me: (token) => request("/auth/me", { token }),
   changePassword: (payload, token) =>
     request("/auth/change-password", { method: "POST", body: payload, token }),
+
+  // Matches backend/src/routes/employees.routes.js.
+  listEmployees: (token) => request("/employees", { token }),
+  getEmployee: (id, token) => request(`/employees/${id}`, { token }),
+
+  // Stubbed — backend/src/routes/attendance.routes.js has no endpoints yet.
+  // Swap these for real request() calls once check-in/out routes exist.
+  checkIn: () => new Promise((resolve) => setTimeout(() => resolve({ status: "present" }), 300)),
+  checkOut: () => new Promise((resolve) => setTimeout(() => resolve({ status: "absent" }), 300)),
 };
