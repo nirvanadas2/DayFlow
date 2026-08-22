@@ -1,0 +1,61 @@
+/*
+ * Dayflow design tokens.
+ * Warm neutral surfaces + near-black text + one confident accent, so the
+ * green/orange/yellow status dots (attendance state) read as the only
+ * saturated color in the UI. See docs/dayflow-spec.md for status meanings.
+ */
+
+:root {
+  /* Neutrals — warm, not cool gray */
+  --color-bg: #faf7f2;
+  --color-surface: #ffffff;
+  --color-surface-sunken: #f2ede4;
+  --color-border: #e5ded2;
+
+  --color-text: #1c1917;
+  --color-text-secondary: #57534e;
+  --color-text-muted: #8c8579;
+
+  /* Accent — the one confident color, used for primary actions/links/focus */
+  --color-accent: #3b5bdb;
+  --color-accent-hover: #2f49b0;
+  --color-accent-subtle: #e8ecfb;
+  --color-on-accent: #ffffff;
+
+  /* Functional status colors — exact values from spec, do not alter */
+  --color-status-present: #22c55e; /* checked in */
+  --color-status-leave: #f97316; /* on leave */
+  --color-status-absent: #eab308; /* absent / no check-in */
+  --color-status-notification: #ef4444; /* notification indicator */
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-card: 14px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  /* Elevation — subtle, warm-tinted so cards lift off the warm background */
+  --shadow-card: 0 1px 2px rgba(28, 25, 23, 0.06), 0 4px 12px rgba(28, 25, 23, 0.06);
+  --shadow-card-hover: 0 2px 4px rgba(28, 25, 23, 0.08), 0 8px 20px rgba(28, 25, 23, 0.09);
+
+  /* Typography */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
+
+  --line-height-base: 1.5;
+}
